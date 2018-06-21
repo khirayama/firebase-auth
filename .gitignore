@@ -1,4 +1,7 @@
 .DS_Store
 
+.envrc
+api/serviceAccountKey.json
+
 /api/node_modules
 /client/node_modules
