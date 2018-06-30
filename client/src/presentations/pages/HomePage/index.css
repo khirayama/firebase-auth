@@ -1,0 +1,5 @@
+@import 'vars';
+
+.HomePage {
+  background-color: $color-test;
+}

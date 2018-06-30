@@ -4,6 +4,7 @@ import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
 
+import { homeHandler } from 'handlers/homeHandler';
 import { config } from 'secrets/config';
 
 const app: express.App = express();
@@ -70,43 +71,7 @@ document.querySelector('.signin-button').addEventListener('click', () => {
   `);
 });
 
-app.get('/', (req: express.Request, res: express.Response) => {
-  res.send(`
-<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-auth.js"></script>
-<h1>Private</h1>
-<div class="signout-button">SIGN OUT</div>
-<script>
-console.log('Start app at ${new Date().toString()}.');
-const config = ${JSON.stringify(config)};
-firebase.initializeApp(config);
-window.fetch('http://localhost:3001/public', {
-  method: 'GET',
-  mode: 'cors',
-  credentials: 'include',
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-  },
-});
-window.fetch('http://localhost:3001/private?jwt=' + localStorage.getItem('__jwt'), {
-  method: 'GET',
-  mode: 'cors',
-  credentials: 'include',
-  headers: {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-  },
-});
-document.querySelector('.signout-button').addEventListener('click', () => {
-  firebase.auth().signOut().then(() => {
-    localStorage.removeItem('__jwt')
-    window.location.href = '/signin';
-  });
-});
-</script>
-  `);
-});
+app.get('/', homeHandler);
 
 app.listen(3000, () => {
   // tslint:disable-next-line:no-console
