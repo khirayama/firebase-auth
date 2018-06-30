@@ -4,7 +4,7 @@ import { IHomePage } from 'presentations/pages/Home';
 import { config } from 'secrets/config';
 
 export function homeHandler(req: express.Request, res: express.Response): void {
-  const props:IHomePage = {
+  const props: IHomePage = {
     lang: 'ja',
     title: 'title',
     test: 'test',

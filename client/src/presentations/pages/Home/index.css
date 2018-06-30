@@ -1,20 +1,2 @@
-@import 'application/vars';
-
-.HomePage {
-  .HomePage--Header {
-    text-align: right;
-
-    ul {
-      display: inline-block;
-
-      li {
-        display: inline-block;
-        padding: 12px;
-      }
-    }
-  }
-
-  h1 {
-    text-align: center;
-  }
+.Home {
 }

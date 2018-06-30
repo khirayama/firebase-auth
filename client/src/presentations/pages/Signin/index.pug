@@ -1,0 +1,18 @@
+extends /application/Layout
+
+block meta
+  script(src="/pages/Signin/bundle.js" defer)
+  link(rel="stylesheet" href="/pages/Signin/index.css")
+
+block body
+  .Signin
+    ul
+      li
+        a(href="/") HOME
+      li
+        a(href="/signin") SIGN IN
+    h1 Sign in
+      form.signin-form
+        input(name="email" value="example@example.com")
+        input(name="password" value="123456789")
+        button SUBMIT
