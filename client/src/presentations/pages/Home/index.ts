@@ -1,5 +1,5 @@
 // tslint:disable
-import { ILayout } from 'presentations/pages/Layout';
+import { ILayout } from 'presentations/application/Layout';
 import { logger } from 'presentations/utils/logger';
 import { config } from 'secrets/config';
 

@@ -1,6 +1,6 @@
 import * as express from 'express';
 
-import { IHomePage } from 'presentations/pages/HomePage';
+import { IHomePage } from 'presentations/pages/Home';
 import { config } from 'secrets/config';
 
 export function homeHandler(req: express.Request, res: express.Response): void {
@@ -10,5 +10,5 @@ export function homeHandler(req: express.Request, res: express.Response): void {
     test: 'test',
   };
 
-  res.render('pages/HomePage', { props });
+  res.render('pages/Home', { props });
 }

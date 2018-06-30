@@ -1,0 +1,16 @@
+extends /application/Layout
+
+block meta
+  script(src="/pages/Home/bundle.js" defer)
+  link(rel="stylesheet" href="/pages/Home/index.css")
+
+block body
+  .HomePage
+    .HomePage--Header
+      ul
+        li
+          a(href="/signup") SIGN UP
+        li
+          a(href="/signin") SIGN IN
+    h1 Hello Sample App
+
