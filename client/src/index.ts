@@ -1,16 +1,27 @@
-const express = require('express');
+import * as path from 'path';
 
-const app = express();
+import * as compression from 'compression';
+import * as cookieParser from 'cookie-parser';
+import * as express from 'express';
 
-const config = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-};
-const email = 'example@test.com';
-const password = '1234example';
+import { config } from 'secrets/config';
 
-app.get('/signup', (req, res) => {
+const app: express.App = express();
+
+const basedir: string = path.join(__dirname, 'presentations');
+app.locals.basedir = basedir;
+app
+  .set('views', basedir)
+  .set('view engine', 'pug')
+  .use(compression({ level: 9 }))
+  .use(express.static(path.join(__dirname, 'assets')))
+  .use(express.static(path.join(__dirname, 'public')))
+  .use(cookieParser());
+
+const email: string = 'example@test.com';
+const password: string = '1234example';
+
+app.get('/signup', (req: express.Request, res: express.Response) => {
   res.send(`
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-auth.js"></script>
@@ -22,11 +33,11 @@ const config = ${JSON.stringify(config)};
 firebase.initializeApp(config);
 document.querySelector('.signup-button').addEventListener('click', () => {
   firebase.auth().createUserWithEmailAndPassword('${email}', '${password}').then(res => {
-    localStorage.setItem('jwt', res.qa)
+    localStorage.setItem('__jwt', res.qa)
     window.location.href = '/';
   }).catch(error => {
     firebase.auth().signInWithEmailAndPassword('${email}', '${password}').then(res => {
-      localStorage.setItem('jwt', res.qa)
+      localStorage.setItem('__jwt', res.qa)
       window.location.href = '/';
     }, err => {
       alert(err.message)
@@ -36,7 +47,8 @@ document.querySelector('.signup-button').addEventListener('click', () => {
 </script>
   `);
 });
-app.get('/signin', (req, res) => {
+
+app.get('/signin', (req: express.Request, res: express.Response) => {
   res.send(`
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-auth.js"></script>
@@ -48,7 +60,7 @@ const config = ${JSON.stringify(config)};
 firebase.initializeApp(config);
 document.querySelector('.signin-button').addEventListener('click', () => {
   firebase.auth().signInWithEmailAndPassword('${email}', '${password}').then(res => {
-    localStorage.setItem('jwt', res.qa)
+    localStorage.setItem('__jwt', res.qa)
     window.location.href = '/';
   }, err => {
     alert(err.message)
@@ -57,7 +69,8 @@ document.querySelector('.signin-button').addEventListener('click', () => {
 </script>
   `);
 });
-app.get('/', (req, res) => {
+
+app.get('/', (req: express.Request, res: express.Response) => {
   res.send(`
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-auth.js"></script>
@@ -76,7 +89,7 @@ window.fetch('http://localhost:3001/public', {
     'Content-Type': 'application/json',
   },
 });
-window.fetch('http://localhost:3001/private?jwt=' + localStorage.getItem('jwt'), {
+window.fetch('http://localhost:3001/private?jwt=' + localStorage.getItem('__jwt'), {
   method: 'GET',
   mode: 'cors',
   credentials: 'include',
@@ -87,7 +100,7 @@ window.fetch('http://localhost:3001/private?jwt=' + localStorage.getItem('jwt'),
 });
 document.querySelector('.signout-button').addEventListener('click', () => {
   firebase.auth().signOut().then(() => {
-    localStorage.removeItem('jwt')
+    localStorage.removeItem('__jwt')
     window.location.href = '/signin';
   });
 });
@@ -95,4 +108,7 @@ document.querySelector('.signout-button').addEventListener('click', () => {
   `);
 });
 
-app.listen(3000);
+app.listen(3000, () => {
+  // tslint:disable-next-line:no-console
+  console.log('Start app at http://localhost:3000.');
+});
