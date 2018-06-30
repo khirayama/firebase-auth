@@ -1,11 +1,1 @@
 .DS_Store
-.envrc
-
-/* Client */
-/client/node_modules
-/client/src/secrets/*.ts
-!/client/src/secrets/*.example.ts
-
-/* API */
-/api/node_modules
-/api/serviceAccountKey.json
