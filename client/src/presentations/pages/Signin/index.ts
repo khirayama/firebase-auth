@@ -1,9 +1,6 @@
-// tslint:disable
 import { ILayout } from 'presentations/application/Layout';
+import { auth, IAuthError, IUser } from 'presentations/utils/auth';
 import { logger } from 'presentations/utils/logger';
-import { auth } from 'presentations/utils/auth';
-
-declare var firebase: any;
 
 export interface ISigninPage extends ILayout {
   test: string;
@@ -14,28 +11,38 @@ window.addEventListener('DOMContentLoaded', () => {
 
   document.querySelector('.signin-form').addEventListener('submit', (event: Event) => {
     event.preventDefault();
-    const emailElement: HTMLElement = (event.currentTarget as HTMLElement).querySelector('input[name=email]');
-    const passwordElement: HTMLElement = (event.currentTarget as HTMLElement).querySelector('input[name=password]');
-    const email: string = (emailElement as HTMLInputElement).value;
-    const password: string = (passwordElement as HTMLInputElement).value;
+    const emailElement: HTMLElement = (<HTMLElement>event.currentTarget).querySelector('input[name=email]');
+    const passwordElement: HTMLElement = (<HTMLElement>event.currentTarget).querySelector('input[name=password]');
+    const email: string = (<HTMLInputElement>emailElement).value;
+    const password: string = (<HTMLInputElement>passwordElement).value;
 
     auth
       .signupNewUser({
         email,
         password,
       })
-      .catch((res: any) => {
-        if (res.status === 400 && res.data.error.message === 'EMAIL_EXISTS') {
+      .then(
+        (user: IUser): void => {
+          auth.saveUser({
+            idToken: user.idToken,
+            refreshToken: user.refreshToken,
+          });
+          window.location.href = '/';
+        },
+      )
+      .catch((err: IAuthError) => {
+        if (err.status === 400 && err.data.error.message === 'EMAIL_EXISTS') {
           auth
             .verifyPassword({
               email,
               password,
             })
-            .then((res: any) => {
+            .then((res: IUser) => {
               auth.saveUser({
                 idToken: res.idToken,
                 refreshToken: res.refreshToken,
               });
+              window.location.href = '/';
             });
         }
       });

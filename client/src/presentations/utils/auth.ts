@@ -4,9 +4,14 @@ import axios, { AxiosError, AxiosInstance } from 'axios';
 import { logger } from 'presentations/utils/logger';
 import { config } from 'secrets/config';
 
-interface IAuthError {
+export interface IAuthError {
   status: number;
   data: any;
+}
+
+export interface IUser {
+  idToken: string;
+  refreshToken: string;
 }
 
 type signDataType = {
@@ -31,23 +36,23 @@ function parseError(err: AxiosError): IAuthError {
 
 export const auth: {
   req: AxiosInstance;
-  saveUser(user: { [key: string]: string }): void;
-  loadUser(): { [key: string]: string };
-  signupNewUser(data: signDataType): Promise<void>;
-  verifyPassword(data: signDataType): Promise<void>;
+  saveUser(user: IUser): void;
+  loadUser(): IUser;
+  signupNewUser(data: signDataType): Promise<IUser>;
+  verifyPassword(data: signDataType): Promise<IUser>;
 } = {
   req: axios.create({
     baseURL: FIREBASE_URL,
   }),
-  saveUser: (user: { [key: string]: string }): void => {
+  saveUser: (user: IUser): void => {
     window.localStorage.setItem('__user', JSON.stringify(user));
   },
-  loadUser: (): { [key: string]: string } => {
+  loadUser: (): IUser => {
     const res: string = window.localStorage.getItem('__user');
 
-    return <{ [key: string]: string }>JSON.parse(res);
+    return <IUser>JSON.parse(res);
   },
-  signupNewUser: (data: signDataType): Promise<void> => {
+  signupNewUser: (data: signDataType): Promise<IUser> => {
     return new Promise(
       (resolve: any, reject: any): void => {
         auth.req
@@ -65,7 +70,7 @@ export const auth: {
       },
     );
   },
-  verifyPassword: (data: signDataType): Promise<any> => {
+  verifyPassword: (data: signDataType): Promise<IUser> => {
     return new Promise(
       (resolve: any, reject: any): void => {
         auth.req
