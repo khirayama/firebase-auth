@@ -1,7 +1,7 @@
 import { ILayout } from 'presentations/application/Layout';
+import { sampleService } from 'presentations/services/sampleService';
 import { logger } from 'presentations/utils/logger';
 import { config } from 'secrets/config';
-import { sampleService } from 'services/sampleService';
 
 export interface IHomePage extends ILayout {
   test: string;
