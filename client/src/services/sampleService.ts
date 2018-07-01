@@ -31,33 +31,6 @@ function req(request: any): any {
   );
 }
 
-// tslint:disable-next-line:no-http-string
-const API_SERVER_HOST: string = process.env.API_SERVER_HOST || 'http://127.0.0.1:3001';
-
-// tslint:disable-next-line:no-unnecessary-class
-class Service {
-  protected static createRequest(baseURL: string): AxiosInstance {
-    const user: IUser = auth.loadUser();
-
-    return axios.create({
-      baseURL: API_SERVER_HOST + baseURL,
-      headers: {
-        Authorization: `Bearer ${user.idToken}`,
-      },
-    });
-  }
-}
-
-export class Sample extends Service {
-  private static baseURL: string = '/';
-
-  public static HOGE(): void {
-    logger.info(this.baseURL);
-  }
-}
-
-Sample.HOGE();
-
 export const sampleService: {
   req(): AxiosInstance;
   public(): Promise<any>;
