@@ -45,6 +45,7 @@ export const auth: {
   saveUser(user: IUser): void;
   loadUser(): IUser;
   signupNewUser(data?: signDataType): Promise<IUser>;
+  setAccountInfo(data: any): Promise<IUser>;
   verifyPassword(data: signDataType): Promise<IUser>;
   refreshToken(): Promise<IUser>;
 } = {
@@ -68,6 +69,32 @@ export const auth: {
         auth.req
           .post(`/signupNewUser?key=${config.apiKey}`, {
             ...data,
+            returnSecureToken: true,
+          })
+          .then((res: AxiosResponse<IUser>) => {
+            const newUser: IUser = {
+              idToken: res.data.idToken,
+              refreshToken: res.data.refreshToken,
+            };
+            auth.saveUser(newUser);
+            resolve(newUser);
+          })
+          .catch((err: AxiosError) => {
+            const authError: IAuthError = parseError(err);
+            reject(authError);
+          });
+      },
+    );
+  },
+  setAccountInfo: (data: any): Promise<IUser> => {
+    const user: IUser = auth.loadUser();
+
+    return new Promise(
+      (resolve: any, reject: any): void => {
+        auth.req
+          .post(`/setAccountInfo?key=${config.apiKey}`, {
+            ...data,
+            idToken: user.idToken,
             returnSecureToken: true,
           })
           .then((res: AxiosResponse<IUser>) => {
