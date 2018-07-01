@@ -1,5 +1,4 @@
 //tslint:disable:no-console no-any
-
 export const logger: {
   info(...args: any[]): void;
   warn(...args: any[]): void;
