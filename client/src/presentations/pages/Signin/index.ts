@@ -16,11 +16,16 @@ window.addEventListener('DOMContentLoaded', () => {
     const email: string = (<HTMLInputElement>emailElement).value;
     const password: string = (<HTMLInputElement>passwordElement).value;
 
-    auth
-      .signupNewUser({
-        email,
-        password,
-      })
+    (auth.isSignin()
+      ? auth.setAccountInfo({
+          email,
+          password,
+        })
+      : auth.signupNewUser({
+          email,
+          password,
+        })
+    )
       .then(
         (user: IUser): void => {
           window.location.href = '/';
