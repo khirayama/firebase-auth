@@ -53,7 +53,7 @@ export const auth: {
 
     return <IUser>JSON.parse(res);
   },
-  signupNewUser: (data: signDataType): Promise<IUser> => {
+  signupNewUser: (data?: signDataType): Promise<IUser> => {
     return new Promise(
       (resolve: any, reject: any): void => {
         auth.req
