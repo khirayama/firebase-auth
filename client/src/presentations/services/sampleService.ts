@@ -1,5 +1,5 @@
 import { AxiosInstance } from 'axios';
-import { create, retry } from 'services/utils';
+import { create, retry } from 'presentations/services/utils';
 
 export interface IMessage {
   message: string;
