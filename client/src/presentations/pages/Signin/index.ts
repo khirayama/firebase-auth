@@ -7,7 +7,7 @@ export interface ISigninPage extends ILayout {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-  logger.info(`Start Signin at ${new Date().toString()}.`);
+  logger.info(`Start SigninPage at ${new Date().toString()}.`);
 
   document.querySelector('.signin-form').addEventListener('submit', (event: Event) => {
     event.preventDefault();
