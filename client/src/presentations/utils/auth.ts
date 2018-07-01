@@ -40,6 +40,7 @@ export const auth: {
   loadUser(): IUser;
   signupNewUser(data: signDataType): Promise<IUser>;
   verifyPassword(data: signDataType): Promise<IUser>;
+  refreshToken(): Promise<any>;
 } = {
   req: axios.create({
     baseURL: FIREBASE_URL,
@@ -87,5 +88,24 @@ export const auth: {
           });
       },
     );
+  },
+  refreshToken: (): Promise<any> => {
+    const user: IUser = auth.loadUser();
+
+    return new Promise((resolve: any, reject: any): void => {
+      auth.req.post(`https://securetoken.googleapis.com/v1/token?key=${config.apiKey}`, {
+        grant_type: 'refresh_token',
+        refresh_token: user.refreshToken,
+      }).then((res: any) => {
+        auth.saveUser({
+          idToken: res.data.id_token,
+          refreshToken: res.data.refresh_token,
+        });
+        resolve(res.data);
+      }).catch((err: AxiosError) => {
+        const authError: IAuthError = parseError(err);
+        reject(authError);
+      });
+    });
   },
 };
