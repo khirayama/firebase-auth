@@ -4,9 +4,13 @@ export const logger: {
   warn(...args: any[]): void;
 } = {
   info: (...args: any[]): void => {
-    console.log(...args);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(...args);
+    }
   },
   warn: (...args: any[]): void => {
-    console.warn(...args);
+    if (process.env.NODE_ENV !== 'production') {
+      console.warn(...args);
+    }
   },
 };
