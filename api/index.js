@@ -1,16 +1,34 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const admin = require('firebase-admin');
+const jwt = require('jsonwebtoken');
+const axios = require('axios');
 
 const serviceAccount = require('./serviceAccountKey');
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
+let publicKeys = null;
 
 const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+function authHandler(req, res, next) {
+  const authorization = req.headers.authorization || '';
+  const jwtToken = authorization.replace('Bearer ', '');
+  const fullDecodedToken = jwt.decode(jwtToken, {
+    complete: true,
+  });
+  jwt.verify(jwtToken, publicKeys[fullDecodedToken.header.kid], {
+    algorithms: [fullDecodedToken.header.alg],
+  }, (err, decodedToken) => {
+    if (err) {
+      res.status(401).json(err);
+      return;
+    } else {
+      req.decodedToken = decodedToken;
+      next();
+    }
+  });
+}
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
@@ -20,21 +38,17 @@ app.use((req, res, next) => {
   next();
 });
 
-app.get('/public', (req, res) => {
+app.get('/public-resources', (req, res) => {
   res.json({
     message: 'public',
   });
-}).get('/private', (req, res) => {
-  const jwt = req.query.jwt || '';
-  admin.auth().verifyIdToken(jwt).then((decodedToken) => {
-    res.json({
-      message: 'private',
-    });
-  }).catch((error) => {
-    res.status(401).json({
-      message: error,
-    });
+}).get('/private-resources', authHandler, (req, res) => {
+  res.json({
+    message: 'private',
   });
 });
 
-app.listen(3001);
+axios.get('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com').then((res) => {
+  publicKeys = res.data;
+  app.listen(3001);
+});
