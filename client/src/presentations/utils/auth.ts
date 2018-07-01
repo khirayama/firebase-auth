@@ -36,15 +36,19 @@ function parseError(err: AxiosError): IAuthError {
 
 export const auth: {
   req: AxiosInstance;
+  isSignin(): boolean;
   saveUser(user: IUser): void;
   loadUser(): IUser;
-  signupNewUser(data: signDataType): Promise<IUser>;
+  signupNewUser(data?: signDataType): Promise<IUser>;
   verifyPassword(data: signDataType): Promise<IUser>;
   refreshToken(): Promise<any>;
 } = {
   req: axios.create({
     baseURL: FIREBASE_URL,
   }),
+  isSignin: (): boolean => {
+    return !!auth.loadUser();
+  },
   saveUser: (user: IUser): void => {
     window.localStorage.setItem('__user', JSON.stringify(user));
   },
@@ -92,20 +96,26 @@ export const auth: {
   refreshToken: (): Promise<any> => {
     const user: IUser = auth.loadUser();
 
-    return new Promise((resolve: any, reject: any): void => {
-      auth.req.post(`https://securetoken.googleapis.com/v1/token?key=${config.apiKey}`, {
-        grant_type: 'refresh_token',
-        refresh_token: user.refreshToken,
-      }).then((res: any) => {
-        auth.saveUser({
-          idToken: res.data.id_token,
-          refreshToken: res.data.refresh_token,
-        });
-        resolve(res.data);
-      }).catch((err: AxiosError) => {
-        const authError: IAuthError = parseError(err);
-        reject(authError);
-      });
-    });
+    return new Promise(
+      (resolve: any, reject: any): void => {
+        auth.req
+          .post(`https://securetoken.googleapis.com/v1/token?key=${config.apiKey}`, {
+            grant_type: 'refresh_token',
+            refresh_token: user.refreshToken,
+          })
+          .then((res: any) => {
+            const newUser: IUser = {
+              idToken: res.data.id_token,
+              refreshToken: res.data.refresh_token,
+            };
+            auth.saveUser(newUser);
+            resolve(newUser);
+          })
+          .catch((err: AxiosError) => {
+            const authError: IAuthError = parseError(err);
+            reject(authError);
+          });
+      },
+    );
   },
 };
