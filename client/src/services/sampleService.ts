@@ -1,46 +1,46 @@
 // tslint:disable:no-any
-import { auth } from 'presentations/utils/auth';
+import axios, { AxiosInstance } from 'axios';
+import { auth, IUser } from 'presentations/utils/auth';
 import { logger } from 'presentations/utils/logger';
 import { createRequest } from 'services/createRequest';
 
-function handleError(err: any): Promise<any> {
-  return new Promise((resolve: any, reject: any): void => {
-    if (err.status === 401) {
-      logger.info('Refresh token.');
-      logger.warn('Please redo comment out');
-      auth.refreshToken().then(() => {
-        resolve();
-      }).catch(() => {
-        reject();
-      });
-    } else {
-      resolve();
-    }
-  });
+function req(request: any): any {
+  return new Promise(
+    (resolve: any, reject: any): void => {
+      request()
+        .then((res: any) => {
+          resolve(res.data);
+        })
+        .catch((err: any) => {
+          if (err.response.status === 401) {
+            logger.warn('Retry with refreshing token');
+            auth.refreshToken().then(() => {
+              request()
+                .then((res: any) => {
+                  resolve(res.data);
+                })
+                .catch((err2: any) => {
+                  reject(err2.response);
+                });
+            });
+          } else {
+            reject(err.response);
+          }
+        });
+    },
+  );
 }
 
 export const sampleService: {
+  req(): AxiosInstance;
   public(): Promise<any>;
   private(): Promise<any>;
 } = {
+  req: (): AxiosInstance => createRequest('/'),
   public: (): Promise<any> => {
-    return new Promise((resolve: any, reject: any): void => {
-      createRequest('/').get('/public-resources').then((res: any) => {
-        resolve(res.data);
-      }).catch((err: any) => {
-        handleError(err).then(reject);
-      });
-    });
+    return req(() => sampleService.req().get('/public-resources'));
   },
   private: (): Promise<any> => {
-    return new Promise((resolve: any, reject: any): void => {
-      createRequest('/').get('/private-resources').then((res: any) => {
-        resolve(res.data);
-      }).catch((err: any) => {
-        handleError(err.response).then(() => {
-          sampleService.private();
-        });
-      });
-    });
+    return req(() => sampleService.req().get('/private-resources'));
   },
 };
