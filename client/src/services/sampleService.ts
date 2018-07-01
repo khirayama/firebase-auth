@@ -1,7 +1,7 @@
 import { AxiosInstance } from 'axios';
-import { createRequest, req } from 'services/utils';
+import { create, retry } from 'services/utils';
 
-interface IMessage {
+export interface IMessage {
   message: string;
 }
 
@@ -10,11 +10,11 @@ export const sampleService: {
   public(): Promise<IMessage>;
   private(): Promise<IMessage>;
 } = {
-  req: (): AxiosInstance => createRequest('/'),
+  req: create('/'),
   public: (): Promise<IMessage> => {
-    return req(() => sampleService.req().get('/public-resources'));
+    return retry(() => sampleService.req().get('/public-resources'));
   },
   private: (): Promise<IMessage> => {
-    return req(() => sampleService.req().get('/private-resources'));
+    return retry(() => sampleService.req().get('/private-resources'));
   },
 };
