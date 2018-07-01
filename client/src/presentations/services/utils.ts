@@ -1,5 +1,5 @@
 // tslint:disable:no-any
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 
 import { auth, IAuthError, IUser } from 'presentations/utils/auth';
 import { logger } from 'presentations/utils/logger';
@@ -24,23 +24,17 @@ export function retry(request: any): Promise<any> {
   return new Promise(
     (resolve: any, reject: any): void => {
       request()
-        .then((res: any) => {
-          resolve(res.data);
-        })
-        .catch((err: any) => {
+        .then(resolve)
+        .catch((err: AxiosError) => {
           if (err.response.status === 401) {
             logger.warn('Retry with refreshing token');
             auth.refreshToken().then(() => {
               request()
-                .then((res: any) => {
-                  resolve(res.data);
-                })
-                .catch((err2: any) => {
-                  reject(err2.response);
-                });
+                .then(resolve)
+                .catch(reject);
             });
           } else {
-            reject(err.response);
+            reject(err);
           }
         });
     },

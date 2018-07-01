@@ -1,5 +1,5 @@
 // tslint:disable:no-any
-import axios, { AxiosError, AxiosInstance } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 
 import { logger } from 'presentations/utils/logger';
 import { config } from 'secrets/config';
@@ -12,6 +12,11 @@ export interface IAuthError {
 export interface IUser {
   idToken: string;
   refreshToken: string;
+}
+
+export interface IUserResponse {
+  id_token: string;
+  refresh_token: string;
 }
 
 type signDataType = {
@@ -41,7 +46,7 @@ export const auth: {
   loadUser(): IUser;
   signupNewUser(data?: signDataType): Promise<IUser>;
   verifyPassword(data: signDataType): Promise<IUser>;
-  refreshToken(): Promise<any>;
+  refreshToken(): Promise<IUser>;
 } = {
   req: axios.create({
     baseURL: FIREBASE_URL,
@@ -65,7 +70,7 @@ export const auth: {
             ...data,
             returnSecureToken: true,
           })
-          .then((res: any) => {
+          .then((res: AxiosResponse<IUser>) => {
             resolve(res.data);
           })
           .catch((err: AxiosError) => {
@@ -83,7 +88,7 @@ export const auth: {
             ...data,
             returnSecureToken: true,
           })
-          .then((res: any) => {
+          .then((res: AxiosResponse<IUser>) => {
             resolve(res.data);
           })
           .catch((err: AxiosError) => {
@@ -93,7 +98,7 @@ export const auth: {
       },
     );
   },
-  refreshToken: (): Promise<any> => {
+  refreshToken: (): Promise<IUser> => {
     const user: IUser = auth.loadUser();
 
     return new Promise(
@@ -103,7 +108,7 @@ export const auth: {
             grant_type: 'refresh_token',
             refresh_token: user.refreshToken,
           })
-          .then((res: any) => {
+          .then((res: AxiosResponse<IUserResponse>) => {
             const newUser: IUser = {
               idToken: res.data.id_token,
               refreshToken: res.data.refresh_token,
