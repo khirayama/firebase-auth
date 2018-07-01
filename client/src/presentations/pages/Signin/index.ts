@@ -23,10 +23,6 @@ window.addEventListener('DOMContentLoaded', () => {
       })
       .then(
         (user: IUser): void => {
-          auth.saveUser({
-            idToken: user.idToken,
-            refreshToken: user.refreshToken,
-          });
           window.location.href = '/';
         },
       )
@@ -38,10 +34,6 @@ window.addEventListener('DOMContentLoaded', () => {
               password,
             })
             .then((res: IUser) => {
-              auth.saveUser({
-                idToken: res.idToken,
-                refreshToken: res.refreshToken,
-              });
               window.location.href = '/';
             });
         }
