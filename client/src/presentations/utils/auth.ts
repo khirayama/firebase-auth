@@ -71,7 +71,12 @@ export const auth: {
             returnSecureToken: true,
           })
           .then((res: AxiosResponse<IUser>) => {
-            resolve(res.data);
+            const newUser: IUser = {
+              idToken: res.data.idToken,
+              refreshToken: res.data.refreshToken,
+            };
+            auth.saveUser(newUser);
+            resolve(newUser);
           })
           .catch((err: AxiosError) => {
             const authError: IAuthError = parseError(err);
