@@ -3,9 +3,11 @@
 
 extern crate rocket;
 
+use rocket::response::content;
+
 #[get("/")]
-fn index() -> &'static str {
-    "Hello, world!"
+fn index() -> content::Json<&'static str> {
+    content::Json("{ 'message': 'rust' }")
 }
 
 fn main() {
