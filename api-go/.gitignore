@@ -1,5 +1,6 @@
 /bin
 /tmp
+/src/github.com
 
 # Binaries for programs and plugins
 *.exe
