@@ -5,7 +5,6 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -43,13 +42,14 @@ func getPublicKeys() (publicKeys map[string]string, err error) {
 	return publicKeys, nil
 }
 
+var publicKeys, _ = getPublicKeys()
+
 func AuthHandler(next http.HandlerFunc) http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authorization := r.Header.Get("Authorization")
 		jwtToken := strings.Replace(authorization, "Bearer ", "", 1)
 
 		jwtHeader := decodeJwtHeader(jwtToken)
-		publicKeys, _ := getPublicKeys()
 
 		publicKey, ok := publicKeys[jwtHeader.Kid]
 		if !ok {
@@ -65,7 +65,8 @@ func AuthHandler(next http.HandlerFunc) http.HandlerFunc {
 		})
 
 		if !token.Valid {
-			fmt.Println("token is invalid")
+			http.Error(w, "Not authorized", 401)
+			return
 		} else {
 			next(w, r)
 		}
