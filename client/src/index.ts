@@ -6,7 +6,6 @@ import * as express from 'express';
 
 import { homeHandler } from 'handlers/homeHandler';
 import { signinHandler } from 'handlers/signinHandler';
-import { config } from 'secrets/config';
 
 const app: express.App = express();
 
