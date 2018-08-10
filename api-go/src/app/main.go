@@ -8,25 +8,25 @@ import (
 	"github.com/gorilla/mux"
 )
 
-type Resource struct {
+type resource struct {
 	Message string `json:"message"`
 }
 
-func PublicResourceIndexHandler(w http.ResponseWriter, r *http.Request) {
-	resource := Resource{Message: "public"}
-	json.NewEncoder(w).Encode(resource)
+func publicResourceIndexHandler(w http.ResponseWriter, r *http.Request) {
+	resrc := resource{Message: "public"}
+	json.NewEncoder(w).Encode(resrc)
 }
 
-func PrivateResourceIndexHandler(w http.ResponseWriter, r *http.Request) {
-	resource := Resource{Message: "private"}
-	json.NewEncoder(w).Encode(resource)
+func privateResourceIndexHandler(w http.ResponseWriter, r *http.Request) {
+	resrc := resource{Message: "private"}
+	json.NewEncoder(w).Encode(resrc)
 }
 
 func main() {
 	r := mux.NewRouter()
 	r.Use(CORSMiddleware)
-	r.HandleFunc("/public-resources", PublicResourceIndexHandler)
-	r.HandleFunc("/private-resources", AuthHandler(PrivateResourceIndexHandler))
+	r.HandleFunc("/public-resources", publicResourceIndexHandler)
+	r.HandleFunc("/private-resources", AuthHandler(privateResourceIndexHandler))
 
 	http.Handle("/", r)
 	log.Fatal(http.ListenAndServe(":3001", nil))
